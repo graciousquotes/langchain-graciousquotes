@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below. The concept DOI always resolves to the latest version."
+type: software
+title: "langchain-graciousquotes: LangChain tools for fact-checked quote attributions"
+abstract: "LangChain tools that check who really said a quote, from Gracious Quotes' fact-checked records: a verdict, the source the quote was traced to, and MLA, APA or Chicago citations."
+authors:
+  - family-names: Say
+    given-names: Jeremiah
+    orcid: "https://orcid.org/0009-0009-2025-7691"
+    affiliation: Gracious Quotes
+version: 0.1.0
+date-released: 2026-10-09
+doi: 10.5281/zenodo.23258870
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23258870
+    description: Concept DOI (all versions; resolves to the latest)
+  - type: doi
+    value: 10.5281/zenodo.23258871
+    description: Version 0.1.0
+license: MIT
+repository-code: "https://github.com/graciousquotes/langchain-graciousquotes"
+url: "https://graciousquotes.com/developers/langchain/"
+keywords:
+  - LangChain
+  - quote attribution
+  - misattributed quotes
+  - fact-checking
+  - citation

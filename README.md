@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/graciousquotes/langchain-graciousquotes/actions/workflows/ci.yml/badge.svg)](https://github.com/graciousquotes/langchain-graciousquotes/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/langchain-graciousquotes)](https://pypi.org/project/langchain-graciousquotes/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23258870.svg)](https://doi.org/10.5281/zenodo.23258870)
 
 LangChain tools that check who really said a quote. Each answer comes from
 [Gracious Quotes](https://graciousquotes.com)' fact-checked records: a verdict, the reason for it,
@@ -103,6 +104,17 @@ pytest -q
 
 The suite includes LangChain's own conformance tests (`langchain-tests`, unit and integration, sync and async) and runs against the
 live API with no key, the same way a new user would.
+
+## How to cite
+
+> Say, J. (2026). *langchain-graciousquotes: LangChain tools for fact-checked quote attributions* (Version 0.1.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.23258870
+
+The DOI above always resolves to the latest version; each release also has its own DOI on [Zenodo](https://doi.org/10.5281/zenodo.23258870).
+`CITATION.cff` gives the same details to GitHub's "Cite this repository" button.
+
+## API description
+
+The API the tools call is described in OpenAPI 3.1 at [graciousquotes.com/developers/openapi.json](https://graciousquotes.com/developers/openapi.json).
 
 ## Who maintains this
 
