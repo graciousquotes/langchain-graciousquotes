@@ -41,6 +41,27 @@ jobs:
           print("keyless check returns the re-credited author with its record link")
           PY
 
+  guide-example:
+    name: The guide's agent example builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      # The agent example on graciousquotes.com/developers/langchain/ must at least import and build with
+      # current LangChain. No model is called (dummy key), so this costs nothing.
+      - run: pip install -e . langchain langchain-anthropic
+      - name: create_agent with the three tools
+        env: { ANTHROPIC_API_KEY: "sk-ant-not-used" }
+        run: |
+          python - <<'PY'
+          import langchain
+          from langchain.agents import create_agent
+          from langchain_graciousquotes import QuoteAttributionCheck, QuoteCitation, QuoteSearch
+          agent = create_agent("anthropic:claude-sonnet-5-5", tools=[QuoteAttributionCheck(), QuoteSearch(), QuoteCitation()])
+          print("langchain", langchain.__version__, "-> agent built:", type(agent).__name__)
+          PY
+
   latest:
     name: Against the latest langchain-core
     runs-on: ubuntu-latest
