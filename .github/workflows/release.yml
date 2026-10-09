@@ -1,0 +1,97 @@
+name: Release
+
+# Same self-healing convention as the SDK and MCP repos: the manifest version in
+# pyproject.toml is the only source of truth. Each run asks PyPI whether it
+# already has that version and publishes only if not. So bumping the version IS
+# the release, an unchanged version is a no-op, and a publish blocked on
+# credentials heals itself on the weekly run without a new commit.
+#
+# No token is stored anywhere — this uses PyPI Trusted Publishing (OIDC).
+# One-time owner setup on PyPI: Publishing -> Add a pending publisher
+#   owner: graciousquotes | repo: langchain-graciousquotes
+#   workflow: release.yml | environment: release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "langchain_graciousquotes/**"
+      - "pyproject.toml"
+      - ".github/workflows/release.yml"
+  schedule:
+    - cron: "23 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  pypi:
+    name: PyPI
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write      # create the GitHub Release
+      id-token: write      # Trusted Publishing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+
+      - name: Read the version from pyproject.toml
+        id: v
+        run: |
+          V=$(python -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+
+      - name: Is it already on PyPI?
+        id: check
+        run: |
+          V="${{ steps.v.outputs.version }}"
+          CODE=$(curl -sS -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/langchain-graciousquotes/$V/json")
+          if [ "$CODE" = "200" ]; then
+            echo "PyPI already has langchain-graciousquotes $V — nothing to do." >> "$GITHUB_STEP_SUMMARY"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          elif [ "$CODE" = "404" ]; then
+            echo "PyPI is missing langchain-graciousquotes **$V** — publishing." >> "$GITHUB_STEP_SUMMARY"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::PyPI returned HTTP $CODE for version $V — refusing to guess."
+            exit 1
+          fi
+
+      - name: Tests must pass before anything ships
+        if: steps.check.outputs.publish == 'true'
+        run: |
+          pip install -e ".[test]"
+          pytest -q
+
+      - name: Build
+        if: steps.check.outputs.publish == 'true'
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build
+          python -m twine check dist/*
+
+      - name: Publish
+        if: steps.check.outputs.publish == 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
+
+      - name: Tag it on GitHub
+        if: steps.check.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          V: ${{ steps.v.outputs.version }}
+        run: |
+          if gh release view "v$V" >/dev/null 2>&1; then
+            echo "Release v$V already exists." >> "$GITHUB_STEP_SUMMARY"; exit 0
+          fi
+          gh release create "v$V" --target "$GITHUB_SHA" --title "v$V" \
+            --notes "\`pip install langchain-graciousquotes==$V\` — [PyPI](https://pypi.org/project/langchain-graciousquotes/$V/)" \
+            --generate-notes

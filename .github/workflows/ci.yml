@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push: { branches: [main] }
+  pull_request:
+  schedule:
+    # Weekly. Two things break this package without anyone touching it: a
+    # langchain-core release changing the tool interface, and the Gracious Quotes API
+    # changing its response shape. Both are upstream, both are silent, and a
+    # user hitting them first is the failure mode this job exists to prevent.
+    - cron: "41 7 * * 2"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "${{ matrix.python }}" }
+      - run: pip install -e ".[test]"
+
+      # The API is keyless. The integration suite hits it for real, so a green
+      # run here proves the advertised no-key path works for a stranger.
+      - name: LangChain conformance + behaviour suite
+        run: pytest -q
+
+      - name: The keyless promise in the README must hold
+        run: |
+          python - <<'PY'
+          from langchain_graciousquotes import QuoteAttributionCheck
+          out = QuoteAttributionCheck().invoke({"quote": "Do not follow where the path may lead. Go instead where there is no path and leave a trail."})
+          assert "Muriel Strode" in out and "Record: https://graciousquotes.com/" in out, out
+          print("keyless check returns the re-credited author with its record link")
+          PY
+
+  latest:
+    name: Against the latest langchain-core
+    runs-on: ubuntu-latest
+    # Informational: an upstream release should warn us, not block our PRs.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: |
+          pip install -e ".[test]"
+          pip install --upgrade langchain-core langchain-tests
+          python -c "import langchain_core; print('langchain-core', langchain_core.__version__)"
+      - run: pytest -q
