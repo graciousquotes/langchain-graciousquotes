@@ -11,7 +11,7 @@ Many popular quotes are credited to the wrong person, or were never said at all.
 answering from memory repeats the attribution it has seen most often, which for famous lines is
 frequently the wrong one. These tools give the agent the checked record instead.
 
-No API key. No sign-up.
+No API key. No sign-up. Guide: [graciousquotes.com/developers/langchain/](https://graciousquotes.com/developers/langchain/)
 
 ```bash
 pip install langchain-graciousquotes

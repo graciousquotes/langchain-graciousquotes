@@ -32,7 +32,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://graciousquotes.com/how-we-source-quotes/"
+Homepage = "https://graciousquotes.com/developers/langchain/"
+Method = "https://graciousquotes.com/how-we-source-quotes/"
 Source = "https://github.com/graciousquotes/langchain-graciousquotes"
 Issues = "https://github.com/graciousquotes/langchain-graciousquotes/issues"
 Terms = "https://graciousquotes.com/terms-and-conditions/#ai"
