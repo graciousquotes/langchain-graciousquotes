@@ -64,6 +64,36 @@ agent.invoke({"messages": [{"role": "user", "content": "Did Einstein say the def
 
 Async works too: every tool supports `ainvoke`.
 
+### Check every quote in a draft (no AI model, no key)
+
+[`examples/check_draft.py`](examples/check_draft.py) finds the quotes in an article, reads the name the
+article gives each one ("Emerson told us", "— Seneca"), and checks both against the records:
+
+```bash
+python examples/check_draft.py my-post.md          # a file
+python examples/check_draft.py https://example.com/post/   # a published page
+cat my-post.md | python examples/check_draft.py -  # piped text; add --json for machine output
+```
+
+```text
+4 to fix · 1 unverified · 2 OK
+
+FIX        “The only thing we have to fear is fear itself.”
+           Your draft credits: Mark Twain
+           Record: Verified. Yes: President Franklin D. Roosevelt said it.
+           Fix: Credit President Franklin D. Roosevelt instead of Mark Twain. Source: First Inaugural Address (1933).
+           Evidence: https://graciousquotes.com/quotes-with-sources/franklin-d-roosevelt/#q12917
+...
+OK         “insanity is doing the same thing over and over again and expecting different results.”
+           Your draft credits: Albert Einstein (hedged)
+           Note: Fine as written: you already present it as an attribution, which matches the record.
+```
+
+Labels: **FIX** (wrong name, or presented as fact when no reliable source exists), **CHECK** (only part of the
+wording matches a checked quote), **UNVERIFIED** (no checked record), **OK**. It exits with code 1 when anything
+needs fixing (`--strict` also fails on CHECK and UNVERIFIED), so it can block a publish step in CI.
+Name detection is a heuristic; when unsure, it reports CHECK rather than a firm verdict.
+
 ## What the verdicts mean
 
 | Status | Meaning |
