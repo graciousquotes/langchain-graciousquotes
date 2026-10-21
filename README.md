@@ -3,6 +3,7 @@
 [![CI](https://github.com/graciousquotes/langchain-graciousquotes/actions/workflows/ci.yml/badge.svg)](https://github.com/graciousquotes/langchain-graciousquotes/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/langchain-graciousquotes)](https://pypi.org/project/langchain-graciousquotes/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23258870.svg)](https://doi.org/10.5281/zenodo.23258870)
+[![Listed in LangChain docs](https://img.shields.io/badge/LangChain-integrations%20directory-1C3C3C)](https://docs.langchain.com/oss/python/integrations/tools)
 
 LangChain tools that check who really said a quote. Each answer comes from
 [Gracious Quotes](https://graciousquotes.com)' fact-checked records: a verdict, the reason for it,
@@ -134,6 +135,11 @@ pytest -q
 
 The suite includes LangChain's own conformance tests (`langchain-tests`, unit and integration, sync and async) and runs against the
 live API with no key, the same way a new user would.
+
+Listed in LangChain's own integration docs: as
+[`GraciousQuotes`](https://docs.langchain.com/oss/python/integrations/tools)
+in the Python tools directory, and as a provider in
+[all providers](https://docs.langchain.com/oss/python/integrations/providers/all_providers).
 
 ## How to cite
 
